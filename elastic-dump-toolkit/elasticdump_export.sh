@@ -10,18 +10,18 @@ mkdir -p "$OUTPUT_DIR"
 
 # Index patterns and their corresponding integration folders
 declare -A INTEGRATIONS=(
-  # [".ds-logs-windows.powershell-default-*"]="windows"
-  # [".ds-logs-windows.powershell_operational-default-*"]="windows"
-  # [".ds-logs-windows.windows_defender-default-*"]="windows"
-  # [".ds-logs-panw.panos-default-*"]="panw"
-  # [".ds-logs-fortinet_fortigate.log-default-*"]="fortinet"
-  # [".ds-logs-crowdstrike.alert-default-*"]="crowdstrike"
-  # [".ds-logs-o365.audit-default-*"]="o365"
-  # [".ds-logs-system.system-default-*"]="system"
-  # [".ds-logs-system.auth-default-*"]="system"
+  [".ds-logs-windows.powershell-default-*"]="windows"
+  [".ds-logs-windows.powershell_operational-default-*"]="windows"
+  [".ds-logs-windows.windows_defender-default-*"]="windows"
+  [".ds-logs-panw.panos-default-*"]="panw"
+  [".ds-logs-fortinet_fortigate.log-default-*"]="fortinet"
+  [".ds-logs-crowdstrike.alert-default-*"]="crowdstrike"
+  [".ds-logs-o365.audit-default-*"]="o365"
+  [".ds-logs-system.system-default-*"]="system"
+  [".ds-logs-system.auth-default-*"]="system"
   [".ds-logs-system.syslog-default-*"]="system"
-  # [".ds-logs-system.application-default-*"]="system"
-  # [".ds-logs-system.security-default-*"]="system"
+  [".ds-logs-system.application-default-*"]="system"
+  [".ds-logs-system.security-default-*"]="system"
 )
 
 # Set the max size for each gzip file (3G)
@@ -43,7 +43,8 @@ for INDEX in "${!INTEGRATIONS[@]}"; do
   NODE_TLS_REJECT_UNAUTHORIZED=0 elasticdump \
     --input="$ELASTICSEARCH_URL/$INDEX" \
     --output="$" \
-    --headers="{\"Authorization\":\"ApiKey ${API_KEY}\"}" | \
+    --headers="{\"Authorization\":\"ApiKey ${API_KEY}\"}" \
+    --limit=1000 | \
     gzip | \
     split -b "$MAX_SIZE" - "$DEST_DIR/${INDEX#.ds-logs-}.json.gz.part_"
 

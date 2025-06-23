@@ -1,0 +1,49 @@
+version: '3.5'
+
+# will contain all elasticsearch data.
+volumes:
+  elasticsearch-data-1:
+
+services:
+  elasticsearch-1:
+    image: elastdocker/elasticsearch:${ELK_VERSION}
+    build:
+      context: elasticsearch-1/
+      args:
+        ELK_VERSION: ${ELK_VERSION}
+    restart: unless-stopped
+    environment:
+      ELASTIC_USERNAME: ${ELASTIC_USERNAME}
+      ELASTIC_PASSWORD: ${ELASTIC_PASSWORD}
+      ELASTIC_CLUSTER_NAME: ${ELASTIC_CLUSTER_NAME}
+      ELASTIC_NODE_NAME: ${ELASTIC_NODE_NAME_1}
+      ELASTIC_INIT_MASTER_NODE: ${ELASTIC_INIT_MASTER_NODE}
+      ELASTIC_DISCOVERY_SEEDS: ${ELASTIC_DISCOVERY_SEEDS}
+      ELASTICSEARCH_PORT: ${ELASTICSEARCH_PORT}
+      ELASTIC_NODE_ROLE: ${ELASTIC_NODE_ROLE_1}
+      ES_JAVA_OPTS: -Xmx${ELASTICSEARCH_HEAP} -Xms${ELASTICSEARCH_HEAP} -Des.enforce.bootstrap.checks=true
+      bootstrap.memory_lock: "true"
+    ports:
+      - "9210:${ELASTICSEARCH_PORT}"
+      - "9310:9300"
+    volumes:
+      - elasticsearch-data-1:/usr/share/elasticsearch/data
+      - ./elasticsearch-1/config/elasticsearch.yml:/usr/share/elasticsearch/config/elasticsearch.yml
+      - ./elasticsearch-1/config/log4j2.properties:/usr/share/elasticsearch/config/log4j2.properties
+    secrets:
+      - source: elasticsearch.keystore
+        target: /usr/share/elasticsearch/config/elasticsearch.keystore
+      - source: elastic.ca
+        target: /usr/share/elasticsearch/config/certs/ca.crt
+      - source: elasticsearch.certificate
+        target: /usr/share/elasticsearch/config/certs/elasticsearch.crt
+      - source: elasticsearch.key
+        target: /usr/share/elasticsearch/config/certs/elasticsearch.key
+    ulimits:
+      memlock:
+        soft: -1
+        hard: -1
+      nofile:
+        soft: 200000
+        hard: 200000
+

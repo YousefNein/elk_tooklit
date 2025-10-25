@@ -1,0 +1,13 @@
+# Change a mapping field(s) name in Forti CEF logs
+name: Convert Sigma fields to firewall fields
+priority: 100
+transformations:
+  - id: fortigate
+    type: field_name_mapping
+    mapping:
+      direction: network.direction
+      dstport: destination.port
+      srcport: source.port
+      dstip: destination.ip
+      srcip: source.ip
+      service: network.application

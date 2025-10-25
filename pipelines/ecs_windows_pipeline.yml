@@ -1,0 +1,16 @@
+# Change a mapping field(s) name in Windows logs
+name: Convert Image field to ECS
+priority: 100
+transformations:
+  - id: ecs
+    type: field_name_mapping
+    mapping:
+      Image: process.executable
+      ParentImage: process.parent.executable
+      OriginalFileName: process.pe.original_file_name
+      CommandLine: process.command_line
+      ScriptBlockText: powershell.file.script_block_text
+      Product: process.pe.product
+      EventID: event.code
+      Description: process.pe.description
+      TargetObject: registry.path
